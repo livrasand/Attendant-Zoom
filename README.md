@@ -1,10 +1,6 @@
 # Attendant-Zoom
 
-bitsadmin /transfer "Attendant Zoom" /download /priority normal ^
-  "https://raw.githubusercontent.com/livrasand/Attendant-Zoom/d790c0d0d37e4177004daab310f3206899ee9ee7/estasemanavymc.txt" "C:\Users\livra\Downloads\estasemana.txt"
-  
-bitsadmin /transfer "Attendant Zoom" /download /priority normal ^
-  "https://github.com/livrasand/Attendant-Zoom/raw/d790c0d0d37e4177004daab310f3206899ee9ee7/estasemanavymc.txt" "C:\Users\livra\Downloads\estasemana.txt"
+<h3>Multimedia para la reunión Vida y Ministerio Cristianos</h3>
+https://github.com/livrasand/Attendant-Zoom/raw/main/estasemanavymc.txt
 
-bitsadmin /transfer "Attendant Zoom" /download /priority normal ^
-  "https://github.com/livrasand/Attendant-Zoom/raw/main/estasemanavymc.txt" "C:\Users\livra\Downloads\estasemana.txt"
+<h3>Multimedia para la reunión La Atalaya</h3>
