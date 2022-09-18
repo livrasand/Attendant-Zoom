@@ -7,4 +7,4 @@ https://github.com/livrasand/Attendant-Zoom/raw/main/estasemanavymc.txt
 https://github.com/livrasand/Attendant-Zoom/raw/main/estasemanala.txt
 
 <br><br>
-<strong>Lanzar una actualización:</strong> Para lanzar una actualización, se carga el archivo <em>upgrade.html</em> y el instalador de la actualización con el nombre <em>Upgrade.exe</em>. Esto abrirá una pestaña nueva en la app Attendant Zoom.
+<strong>Lanzar una actualización:</strong> Para lanzar una actualización, se carga el archivo <em>upgrade.html</em> y el instalador de la actualización con el nombre <em>Upgrade.exe</em>. Esto abrirá una pestaña nueva en la app Attendant Zoom. Se debe cargar el archivo <em>upgrade.html</em> a http://www.goattendant.com/attendant-zoom/upgrade.html, esta es la página que se verá en Attendant Zoom.
