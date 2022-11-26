@@ -15,14 +15,14 @@ https://github.com/livrasand/Attendant-Zoom/raw/main/estasemanala.txt
 <strong>89.9</strong> - <em>Otoño</em><br>
 <strong>89.0</strong> - <em>Invierno</em>
 <br><br>
-<strong>Códigos</strong><br>
-<strong>77</strong> - <em>Nuevas funciones</em><br>
-<strong>66</strong> - <em>Correción de errores</em><br>
-<strong>44</strong> - <em>Mejoras</em><br>
-<strong>22</strong> - <em>Revisión</em>
-<br><br>
+<strong>Códigos de parches</strong><br>
+<strong>77</strong> - <em>Nuevas modificaciones</em><br>
+<strong>66</strong> - <em>Correción de bugs</em><br>
+<strong>44</strong> - <em>Nueva traducción</em><br>
+<strong>22</strong> - <em>Revisión de seguridad</em>
+<br>
 <p>Siendo entonces una actualización similar a: <em>e9.22.89.9</em></p>
-<br><br>
+<br>
 <p>Si es una actualización BETA, se añade <em>-beta.x</em>, siendo <em>x</em> el valor ascendente de la actualización.
 <br><br>
 <h3>Parches</h3>
