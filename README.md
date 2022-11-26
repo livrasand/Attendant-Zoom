@@ -21,4 +21,9 @@ https://github.com/livrasand/Attendant-Zoom/raw/main/estasemanala.txt
 <strong>44</strong> - <em>Mejoras</em><br>
 <strong>22</strong> - <em>Revisión</em>
 <br><br>
-<p>Si es una actualización BETA, se añade <em>-beta.x</em>, siendo <em>x</em> el valor ascendente de la actualización. El canal PARCHE, son funciones, mejoras o actualizaciones por parte de usuarios.</p>
+<p>Siendo entonces una actualización similar a: <em>e9.22.89.9</em></p>
+<br><br>
+<p>Si es una actualización BETA, se añade <em>-beta.x</em>, siendo <em>x</em> el valor ascendente de la actualización.
+<br><br>
+<h3>Parches</h3>
+<p>Hay diferentes parches, utilizamos <b>Parches de depuración</b> para reparar bugs, o errores de programación que no fueron detectados a tiempo en su etapa de desarrollo. Tenemos <b>parches de seguridad</b>, con los cuales solucionamos agujeros de seguridad y, siempre que es posible, tratamos de no modificar la funcionalidad de Attendant Zoom. En ocaciones lanzamos <b>parches de actualización</b>, consiste en modificar Attendant Zoom con el objetivo de incorporar metodologías más nuevas. Por ejemplo, optimizar en tiempo, utilizar algoritmos mejorados, añadir funcionalidades, eliminar secciones obsoletas, etc. También tenemos <b>parches de traducción</b>, estos cambian el idioma definido por Attendant Zoom.</p>
