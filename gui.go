@@ -8,6 +8,11 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/sirupsen/logrus"
+
+	"io/ioutil"
+	"path/filepath"
+
+	"fyne.io/fyne/v2/canvas"
 )
 
 func (c *Config) mGUI(m string) *fyne.Container {
@@ -65,7 +70,7 @@ func (c *Config) mGUI(m string) *fyne.Container {
 	})
 	autoFetchMeetingData.SetChecked(c.AutoFetchMeetingData)
 
-	playlistOption := widget.NewCheck("Crear lista de reproducción", func(p bool) {
+	playlistOption := widget.NewCheck("Crear lista de reproducción para usar con VLC", func(p bool) {
 		c.CreatePlaylist = p
 		c.writeConfigToFile()
 	})
@@ -91,7 +96,6 @@ func (c *Config) mGUI(m string) *fyne.Container {
 			})
 		}
 
-		// reset in case of subsequent runs
 		c.Pictures = []file{}
 		c.Videos = []video{}
 		c.SongsToGet = []string{}
@@ -138,11 +142,11 @@ func (c *Config) settingsGUI() *fyne.Container {
 	purgeDir.SetChecked(c.PurgeSaveDir)
 
 	lang := widget.NewEntry()
-	lang.SetPlaceHolder("Símbolo de lenguaje MEPS (ej. S)")
+	lang.SetPlaceHolder("Idioma del contenido multimedia (ej. S para Español)")
 	lang.SetText(c.Language)
 
 	pubs := widget.NewEntry()
-	pubs.SetPlaceHolder("Símbolos de publicación vinculados para permitir (ej. th, lff)")
+	pubs.SetPlaceHolder("Símbolos de publicaciones para el contenido multimedia (ej. th, lff)")
 	var pubSymbolString string
 	for i, s := range c.PubSymbols {
 		if i != 0 {
@@ -175,4 +179,70 @@ func (c *Config) settingsGUI() *fyne.Container {
 	)
 
 	return settingsBox
+}
+
+func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Container {
+    downloadedFolderPath := "C:\\GoAttendant\\Attendant Zoom\\meetings"
+
+    files, err := ioutil.ReadDir(downloadedFolderPath)
+    if err != nil {
+        // Registra el error
+        logrus.Warn(err)
+    }
+
+    var fileNames []string
+    for _, file := range files {
+        fileNames = append(fileNames, file.Name())
+    }
+
+    fileList := widget.NewList(
+        func() int {
+            return len(fileNames)
+        },
+        func() fyne.CanvasObject {
+            label := widget.NewLabel("")
+            return label
+        },
+        func(i widget.ListItemID, obj fyne.CanvasObject) {
+            label := obj.(*widget.Label)
+            label.SetText(fileNames[i])
+        },
+    )
+
+
+    fileList.OnSelected = func(id widget.ListItemID) {
+		if id >= 0 && int(id) < len(fileNames) {
+			selectedFileName := fileNames[id]
+			newSelectedFilePath := filepath.Join(downloadedFolderPath, selectedFileName)
+			var currentSelectedFilePath string 
+	
+			if newSelectedFilePath == currentSelectedFilePath {
+				// Si la imagen seleccionada es la misma que la actual, quítala
+				currentSelectedFilePath = ""
+				initialLabel := widget.NewLabel("Selecciona una imagen")
+				mediaviewer.SetContent(container.NewMax(
+					initialLabel,
+				))
+			} else {
+				// Si la imagen seleccionada es diferente, muéstrala y actualiza la selección actual
+				currentSelectedFilePath = newSelectedFilePath
+				setImageInView(mediaviewer, currentSelectedFilePath)
+			}
+		}
+	}
+	
+
+    fileListContainer := container.NewScroll(fileList)
+
+    viewContainer := container.NewMax(
+        fileListContainer,
+    )
+
+    return viewContainer
+}
+
+
+func setImageInView(mediaviewer fyne.Window, imagePath string) {
+	image := canvas.NewImageFromFile(imagePath)
+	mediaviewer.SetContent(container.NewMax(image))
 }

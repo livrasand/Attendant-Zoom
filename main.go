@@ -7,7 +7,9 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"  
+
+	"fyne.io/fyne/v2"
 )
 
 const (
@@ -20,9 +22,9 @@ const (
 	MM          = "MM"
 )
 
-func main() {
+func main() {	
 	config := NewConfig()
-	a := app.New()
+	a := app.NewWithID("AttendantZoom")
 
 	config.DebugMode = flag.Bool("d", false, "descarga falsa; imprimir información de depuración")
 	flag.Parse()
@@ -36,16 +38,28 @@ func main() {
 	pbFormatter := func() string { return config.Progress.Title }
 	config.Progress.ProgressBar.TextFormatter = pbFormatter
 
+	mediaviewer := a.NewWindow("Visualizador")
+	mediaviewer.Resize(fyne.NewSize(640, 360))
+	initialLabel := widget.NewLabel("Selecciona una imagen")
+	mediaviewer.SetContent(container.NewMax(
+		initialLabel,
+	))
+
 	settingsTab := container.NewTabItem("", config.settingsGUI())
 	settingsTab.Icon = theme.SettingsIcon()
+
+	downloadedFilesTab := container.NewTabItem("Reunión", config.createDownloadedFilesView(mediaviewer))
+
 	tabs := container.NewAppTabs(
-		container.NewTabItem("Entresemana", config.mGUI(MM)),
-		container.NewTabItem("Fin de semana", config.mGUI(WM)),
+		downloadedFilesTab,
+		container.NewTabItem("Vida y Ministerio", config.mGUI(MM)),
+		container.NewTabItem("Estudio de La Atalaya", config.mGUI(WM)),
 		settingsTab,
 	)
 
-	w := a.NewWindow("Attendant Zoom - Media Downloader")
+	w := a.NewWindow("Attendant Zoom")
 	w.SetContent(container.NewVBox(tabs))
 
+	mediaviewer.Show()
 	w.ShowAndRun()
 }
