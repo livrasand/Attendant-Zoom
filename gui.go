@@ -13,8 +13,12 @@ import (
 	"path/filepath"
 
 	"fyne.io/fyne/v2/canvas"
-)
 
+	"github.com/gotk3/gotk3/gtk"
+    "github.com/gotk3/gotk3/glib"
+    "log"
+    "os"
+)
 
 var currentSelectedFilePath string
 

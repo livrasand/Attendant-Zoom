@@ -12,4 +12,5 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/pelletier/go-toml v1.8.1
 	github.com/sirupsen/logrus v1.8.1
+	gocv.io/x/gocv v0.34.0 // indirect
 )
