@@ -10,22 +10,31 @@ It facilitates the sharing of multimedia content during meetings, whether on vid
 Developed in Go with Fyne, which allows the application to be cross-platform, available for Windows, macOS and Linux, this application is presented as an excellent alternative to JW Library. It is designed especially for devices that do not have JW Library support, do not have access to an app store, or experience slowness or freezes when using JW Library on their computers. Simplify your meetings and studies with our trusted tool.
 
 # Cómo empezar
-Para instalar todas las dependencias del proyecto, usa:
+#### Pre-requisitos
+- Instala [MinGW toolchain](https://github.com/adrg/libvlc-go/wiki/Install-MinGW-toolchain)
+- Instala [libVLC SDK](https://github.com/adrg/libvlc-go/wiki/Install-on-Windows#install-libvlc-sdk)
+
+Instala todas las dependencias del proyecto:
 ```go
 go get ...
 ```
-Si te obtienes algún error como respuesta de alguna dependencia, prueba instalándola individualmente.
+Si obtienes algún error como respuesta de alguna dependencia, prueba instalándola individualmente.
 
 Para probar la aplicación, utilice el comando `go run`:
 ```go
 go run main.go
 ```
 
-Usando `go build`, puede generar un binario ejecutable para la aplicación, lo que le permitirá implementarlo donde lo desee (Windows, macOS, Linux, Android, iOS o iPad).
+Usando `go build`, puede generar un binario ejecutable para la aplicación, lo que le permitirá implementarlo donde lo desee (Windows, macOS o Linux).
 
 Pruebe esto con `main.go`:
 ```go
 go build
+```
+
+Personalmente recomiendo ejecutar este:
+```go
+go build -ldflags "-s -w" -o
 ```
 
 Si no proporciona un argumento para este comando, `go build` compilará automáticamente el programa `main.go` en su directorio actual. El comando incluirá todos sus archivos `*.go` en el directorio. También creará todo el código de soporte necesario para poder ejecutar el binario en computadoras que tengan la misma arquitectura de sistema que su computadora, independientemente de que este tenga los archivos de origen `.go` o incluso, sin una instalación de Go.

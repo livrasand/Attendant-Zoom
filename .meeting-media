@@ -5,5 +5,5 @@ FetchOtherMedia = true
 Language = "S"
 PubSymbols = ["th", "lff"]
 PurgeSaveDir = true
-Resolution = "720p"
+Resolution = "240p"
 SaveLocation = "C:\\GoAttendant\\Attendant Zoom\\meetings"

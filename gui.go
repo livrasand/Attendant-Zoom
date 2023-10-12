@@ -15,6 +15,9 @@ import (
 	"fyne.io/fyne/v2/canvas"
 )
 
+
+var currentSelectedFilePath string
+
 func (c *Config) mGUI(m string) *fyne.Container {
 
 	date := widget.NewEntry()
@@ -184,9 +187,10 @@ func (c *Config) settingsGUI() *fyne.Container {
 func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Container {
     downloadedFolderPath := "C:\\GoAttendant\\Attendant Zoom\\meetings"
 
+	currentSelectedFilePath := ""
+
     files, err := ioutil.ReadDir(downloadedFolderPath)
     if err != nil {
-        // Registra el error
         logrus.Warn(err)
     }
 
@@ -209,30 +213,52 @@ func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Contai
         },
     )
 
-
-    fileList.OnSelected = func(id widget.ListItemID) {
+	fileList.OnSelected = func(id widget.ListItemID) {
+		// Agrega un mensaje de registro para verificar si se activa el controlador
+		logrus.Infof("OnSelected controlador activado para el elemento %d", id)
+	
 		if id >= 0 && int(id) < len(fileNames) {
 			selectedFileName := fileNames[id]
 			newSelectedFilePath := filepath.Join(downloadedFolderPath, selectedFileName)
-			var currentSelectedFilePath string 
 	
-			if newSelectedFilePath == currentSelectedFilePath {
-				// Si la imagen seleccionada es la misma que la actual, quítala
-				currentSelectedFilePath = ""
-				initialLabel := widget.NewLabel("Selecciona una imagen")
-				mediaviewer.SetContent(container.NewMax(
-					initialLabel,
-				))
+			// Verifica si la extensión del archivo corresponde a una imagen
+			if isImageFile(selectedFileName) {
+				// Limpia las rutas antes de compararlas
+				newSelectedFilePath = filepath.Clean(newSelectedFilePath)
+				currentSelectedFilePath = filepath.Clean(currentSelectedFilePath)
+	
+				// Agrega mensajes de registro para verificar las rutas antes de la comparación
+				logrus.Infof("newSelectedFilePath antes de la comparación: %s", newSelectedFilePath)
+				logrus.Infof("currentSelectedFilePath antes de la comparación: %s")
+	
+				if newSelectedFilePath == currentSelectedFilePath {
+					// Si la imagen seleccionada es la misma que la actual, quítala
+					currentSelectedFilePath = ""
+					initialLabel := widget.NewLabel("Selecciona una imagen")
+					mediaviewer.SetContent(container.NewMax(initialLabel))
+	
+					// Deselecciona el elemento
+					fileList.Unselect(id)
+	
+					logrus.Infof("Ocultar imagen seleccionada")
+				} else {
+					// Si la imagen seleccionada es diferente, muéstrala y actualiza la selección actual
+					currentSelectedFilePath = newSelectedFilePath
+					setImageInView(mediaviewer, currentSelectedFilePath)
+	
+					// Deselecciona el elemento
+					fileList.Unselect(id)
+	
+					logrus.Infof("Mostrar nueva imagen seleccionada")
+				}
 			} else {
-				// Si la imagen seleccionada es diferente, muéstrala y actualiza la selección actual
-				currentSelectedFilePath = newSelectedFilePath
-				setImageInView(mediaviewer, currentSelectedFilePath)
+				logrus.Infof("Este archivo no es una imagen, puedes manejarlo de manera diferente o mostrar un mensaje de error")
 			}
 		}
 	}
 	
-
-    fileListContainer := container.NewScroll(fileList)
+	
+	fileListContainer := container.NewScroll(fileList)
 
     viewContainer := container.NewMax(
         fileListContainer,
@@ -243,6 +269,22 @@ func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Contai
 
 
 func setImageInView(mediaviewer fyne.Window, imagePath string) {
-	image := canvas.NewImageFromFile(imagePath)
-	mediaviewer.SetContent(container.NewMax(image))
+	 image := canvas.NewImageFromFile(imagePath)
+	 mediaviewer.SetContent(container.NewMax(image))
+
+    logrus.Infof("currentSelectedFilePath antes de la actualización: %s", currentSelectedFilePath)
+    
+    currentSelectedFilePath = imagePath
+    
+    logrus.Infof("currentSelectedFilePath después de la actualización: %s", currentSelectedFilePath)
+}
+
+func isImageFile(fileName string) bool {
+    ext := strings.ToLower(filepath.Ext(fileName))
+    return ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif" || ext == ".bmp" || ext == ".webp"
+}
+
+func isVideoFile(fileName string) bool {
+    ext := strings.ToLower(filepath.Ext(fileName))
+    return ext == ".mp4" || ext == ".avi" || ext == ".mkv" || ext == ".mov"
 }
