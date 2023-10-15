@@ -16,13 +16,15 @@ Para comenzar a utilizar esta aplicación, dirígete a la sección de Releases d
 #### ¿Qué puede hacer Attendant Zoom?
 Attendant Zoom le permite descargar, sincronizar, compartir y mostrar fácil y automáticamente toda la multimedia de la reunión. Para reuniones de congregación híbridas o en persona, el modo de presentación de multimedia integrado tiene todas las características necesarias para simplificar la tarea de compartir multimedia con la congregación, que incluyen:
 
-- Miniaturas de la multimedia.
-- Proyectar imágenes y videos.
-- Reproducción de audio.
-- Funciones de _pausa/reproducir/detener_ fáciles de usar para gestionar la reproducción de archivos multimedia.
-- Reproducción sencilla de música de fondo, con parada automática antes del inicio de las reuniones programadas periódicamente.
-- Reconocimiento y gestión automática de monitores externos.
-- Convertir imágenes a MP4.
+- 🧡 Miniaturas de la multimedia.
+- 💚 Proyectar imágenes y videos.
+- 💚 Reproducción de audio.
+- 🧡 Funciones de _pausa/reproducir/detener_ fáciles de usar para gestionar la reproducción de archivos multimedia.
+- 🧡 Interacción de gestos del mouse, controla el reproductor de medios utilizando gestos del mouse de una manera intuitiva y eficiente.
+- 🧡 Reproducción sencilla de música de fondo, con parada automática antes del inicio de las reuniones programadas periódicamente.
+- 🧡 Reconocimiento y gestión automática de monitores externos.
+- 🧡 Convertir imágenes a MP4.
+- 💚 Crea listas de reproducción para VLC
 
 En cuanto a las reuniones de Zoom de congregación totalmente remotas, la función de conversión a MP4 incorporada le permite compartir archivos multimedia de todo tipo fácilmente, utilizando la función para compartir MP4 nativa de Zoom.
 
@@ -63,33 +65,3 @@ Overall, Attendant Zoom is fully featured in JW Library's audio and video depart
 **Yes!** Multimedia for Jehovah's Witness meetings can be automatically downloaded in any of the thousands of languages that are available on JW.ORG. The list of available languages is updated dynamically. All you need to do is select which one you want.
 
 Plus, Attendant Zoom itself is constantly being translated into multiple languages! Therefore, you can configure the language you want to be displayed on the Attendant Zoom interface. Do you want to help translate Attendant Zoom into your language? See our CONTRIBUTING.md file for instructions on how to do this.
-
-# Cómo empezar
-#### Pre-requisitos
-- Instala [MinGW toolchain](https://github.com/adrg/libvlc-go/wiki/Install-MinGW-toolchain)
-- Instala [libVLC SDK](https://github.com/adrg/libvlc-go/wiki/Install-on-Windows#install-libvlc-sdk)
-
-Instala todas las dependencias del proyecto:
-```go
-go get ...
-```
-Si obtienes algún error como respuesta de alguna dependencia, prueba instalándola individualmente.
-
-Para probar la aplicación, utilice el comando `go run`:
-```go
-go run main.go
-```
-
-Usando `go build`, puede generar un binario ejecutable para la aplicación, lo que le permitirá implementarlo donde lo desee (Windows, macOS o Linux).
-
-Pruebe esto con `main.go`:
-```go
-go build
-```
-
-Personalmente recomiendo ejecutar este:
-```go
-go build -ldflags "-s -w" -o
-```
-
-Si no proporciona un argumento para este comando, `go build` compilará automáticamente el programa `main.go` en su directorio actual. El comando incluirá todos sus archivos `*.go` en el directorio. También creará todo el código de soporte necesario para poder ejecutar el binario en computadoras que tengan la misma arquitectura de sistema que su computadora, independientemente de que este tenga los archivos de origen `.go` o incluso, sin una instalación de Go.
