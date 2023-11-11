@@ -4,12 +4,14 @@ import (
 	"flag"
 
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/sirupsen/logrus"  
-
+	"github.com/sirupsen/logrus"
 	"fyne.io/fyne/v2"
+
+	"fmt"
 )
 
 const (
@@ -38,17 +40,21 @@ func main() {
 	pbFormatter := func() string { return config.Progress.Title }
 	config.Progress.ProgressBar.TextFormatter = pbFormatter
 
-	mediaviewer := a.NewWindow("Visualizador")
-	mediaviewer.Resize(fyne.NewSize(640, 360))
-	initialLabel := widget.NewLabel("Selecciona una imagen")
-	mediaviewer.SetContent(container.NewMax(
-		initialLabel,
-	))
+	mediaviewerv := a.NewWindow("Visualizador")
+	mediaviewerv.Resize(fyne.NewSize(640, 360))
+
+	backgroundImage := canvas.NewImageFromFile("resources/yeartext.png")
+	backgroundImage.Resize(fyne.NewSize(640, 360))
+
+	containerv := container.NewMax(backgroundImage)
+	containerv.Resize(fyne.NewSize(640, 360))
+
+	mediaviewerv.SetContent(containerv)
 
 	settingsTab := container.NewTabItem("", config.settingsGUI())
 	settingsTab.Icon = theme.SettingsIcon()
 
-	downloadedFilesTab := container.NewTabItem("Reunión", config.createDownloadedFilesView(mediaviewer))
+	downloadedFilesTab := container.NewTabItem("Reunión", config.createDownloadedFilesView(mediaviewerv))
 
 	tabs := container.NewAppTabs(
 		downloadedFilesTab,
@@ -60,6 +66,9 @@ func main() {
 	w := a.NewWindow("Attendant Zoom")
 	w.SetContent(container.NewVBox(tabs))
 
-	mediaviewer.Show()
+	mediaviewerv.Show()
 	w.ShowAndRun()
+
+	fmt.Println("Presiona Enter para salir...")
+	fmt.Scanln()
 }

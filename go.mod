@@ -6,6 +6,9 @@ require (
 	fyne.io/fyne/v2 v2.0.2
 	github.com/JackMordaunt/icns v1.0.0 // indirect
 	github.com/adrg/libvlc-go/v3 v3.1.5 // indirect
+	github.com/gotk3/gotk3 v0.6.2 // indirect
+	github.com/hajimehoshi/go-mp3 v0.3.4 // indirect
+	github.com/hajimehoshi/oto v1.0.1 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.8
 	github.com/josephspurrier/goversioninfo v1.4.0 // indirect
 	github.com/machinebox/appify v0.0.0-20180512101119-15c1e09ce924 // indirect

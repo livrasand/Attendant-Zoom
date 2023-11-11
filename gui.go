@@ -13,14 +13,64 @@ import (
 	"path/filepath"
 
 	"fyne.io/fyne/v2/canvas"
-
-	"github.com/gotk3/gotk3/gtk"
-    "github.com/gotk3/gotk3/glib"
-    "log"
-    "os"
+	"os"
+    "github.com/hajimehoshi/go-mp3"
+    "github.com/hajimehoshi/oto"
+	"log"
+	"fmt"
 )
 
 var currentSelectedFilePath string
+
+func playAudioMP3(filePath string) {
+	// Abre el archivo MP3 para lectura
+	file, err := os.Open(filePath)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Error al abrir el archivo MP3 '%s': %s", filePath, err)
+		logError(errorMessage)
+		return
+	}
+	defer file.Close()
+
+	// Decodifica el archivo MP3
+	mp3Decoder, err := mp3.NewDecoder(file)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Error al decodificar el archivo MP3 '%s': %s", filePath, err)
+		logError(errorMessage)
+		return
+	}
+
+	// Prepara el contexto de audio Oto
+	otoContext, err := oto.NewContext(44100, 2, 2, 8192)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Error al crear el contexto de audio Oto: %s", err)
+		logError(errorMessage)
+		return
+	}
+	defer otoContext.Close()
+
+	// Crea un nuevo reproductor de audio
+	player := otoContext.NewPlayer()
+	defer player.Close()
+
+	// Lee y reproduce el audio MP3 en un goroutine independiente
+	go func() {
+		buffer := make([]byte, 8192)
+		for {
+			_, err := mp3Decoder.Read(buffer)
+			if err != nil {
+				break
+			}
+			player.Write(buffer)
+		}
+	}()
+}
+
+// La función isMP3File debe determinar si un archivo es un archivo MP3
+func isMP3File(fileName string) bool {
+    ext := strings.ToLower(filepath.Ext(fileName))
+    return ext == ".mp3"
+}
 
 func (c *Config) mGUI(m string) *fyne.Container {
 
@@ -218,14 +268,12 @@ func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Contai
     )
 
 	fileList.OnSelected = func(id widget.ListItemID) {
-		// Agrega un mensaje de registro para verificar si se activa el controlador
 		logrus.Infof("OnSelected controlador activado para el elemento %d", id)
 	
 		if id >= 0 && int(id) < len(fileNames) {
 			selectedFileName := fileNames[id]
 			newSelectedFilePath := filepath.Join(downloadedFolderPath, selectedFileName)
 	
-			// Verifica si la extensión del archivo corresponde a una imagen
 			if isImageFile(selectedFileName) {
 				// Limpia las rutas antes de compararlas
 				newSelectedFilePath = filepath.Clean(newSelectedFilePath)
@@ -238,8 +286,13 @@ func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Contai
 				if newSelectedFilePath == currentSelectedFilePath {
 					// Si la imagen seleccionada es la misma que la actual, quítala
 					currentSelectedFilePath = ""
-					initialLabel := widget.NewLabel("Selecciona una imagen")
-					mediaviewer.SetContent(container.NewMax(initialLabel))
+					backgroundImage := canvas.NewImageFromFile("resources/yeartext.png")
+					backgroundImage.Resize(fyne.NewSize(640, 360))
+
+					containerv := container.NewMax(backgroundImage)
+					containerv.Resize(fyne.NewSize(640, 360))
+
+					mediaviewer.SetContent(containerv)
 	
 					// Deselecciona el elemento
 					fileList.Unselect(id)
@@ -256,7 +309,11 @@ func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Contai
 					logrus.Infof("Mostrar nueva imagen seleccionada")
 				}
 			} else {
-				logrus.Infof("Este archivo no es una imagen, puedes manejarlo de manera diferente o mostrar un mensaje de error")
+				if isMP3File(selectedFileName) {
+					// Reproduce el archivo MP3
+					playAudioMP3(newSelectedFilePath)
+				}
+				
 			}
 		}
 	}
@@ -288,7 +345,32 @@ func isImageFile(fileName string) bool {
     return ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif" || ext == ".bmp" || ext == ".webp"
 }
 
-func isVideoFile(fileName string) bool {
-    ext := strings.ToLower(filepath.Ext(fileName))
-    return ext == ".mp4" || ext == ".avi" || ext == ".mkv" || ext == ".mov"
+//func isVideoFile(fileName string) bool {
+//    ext := strings.ToLower(filepath.Ext(fileName))
+//    return ext == ".mp4" || ext == ".avi" || ext == ".mkv" || ext == ".mov"
+//}
+
+func logError(errorMessage string) {
+    // Configura la ubicación de la carpeta de logs
+    logFolder := "logs"
+
+    // Crea la carpeta de logs si no existe
+    if _, err := os.Stat(logFolder); os.IsNotExist(err) {
+        os.Mkdir(logFolder, os.ModeDir)
+    }
+
+    // Genera el nombre del archivo de registro con fecha y hora
+    logFileName := filepath.Join(logFolder, time.Now().Format("2006-01-02_15-04-05")+".log")
+
+    // Abre el archivo de registro
+    logFile, err := os.OpenFile(logFileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+    if err != nil {
+        fmt.Println("Error al abrir el archivo de registro:", err)
+        return
+    }
+    defer logFile.Close()
+
+    // Escribe el mensaje de error en el archivo de registro
+    log.SetOutput(logFile)
+    log.Println(errorMessage)
 }
