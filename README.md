@@ -20,7 +20,7 @@ Attendant Zoom le permite descargar, sincronizar, compartir y mostrar fácil y a
 - [x] Mostrar la multimedia disponible.
 - [x] Proyectar imágenes.
 - [ ] Reproducir videos.
-- [ ] Reproducción de audio.
+- [x] Reproducción de audio.
 - [ ] Funciones de _pausa/reproducir/detener_ fáciles de usar para gestionar la reproducción de archivos multimedia.
 - [ ] Interacción de gestos del mouse, controla el reproductor de medios utilizando gestos del mouse de una manera intuitiva y eficiente.
 - [ ] Reproducción sencilla de música de fondo, con parada automática antes del inicio de las reuniones programadas periódicamente.

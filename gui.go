@@ -22,7 +22,7 @@ import (
 
 var currentSelectedFilePath string
 
-func playAudioMP3(filePath string) {
+func playAudioMP3(filePath string, done chan bool) {
 	// Abre el archivo MP3 para lectura
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -53,18 +53,31 @@ func playAudioMP3(filePath string) {
 	player := otoContext.NewPlayer()
 	defer player.Close()
 
+	// Configura un buffer de lectura
+	bufferSize := 1
+	buffer := make([]byte, bufferSize)
+
 	// Lee y reproduce el audio MP3 en un goroutine independiente
-	go func() {
-		buffer := make([]byte, 8192)
-		for {
+	for {
+		select {
+		case <-done:
+			// Se recibió la señal de finalización
+			return
+		default:
+			// Sigue leyendo y reproduciendo el audio
 			_, err := mp3Decoder.Read(buffer)
 			if err != nil {
-				break
+				// Fin del archivo MP3
+				done <- true
+				return
 			}
 			player.Write(buffer)
 		}
-	}()
+	}
 }
+
+
+
 
 // La función isMP3File debe determinar si un archivo es un archivo MP3
 func isMP3File(fileName string) bool {
@@ -311,9 +324,11 @@ func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Contai
 			} else {
 				if isMP3File(selectedFileName) {
 					// Reproduce el archivo MP3
-					playAudioMP3(newSelectedFilePath)
-				}
-				
+					done := make(chan bool)
+					go playAudioMP3(newSelectedFilePath, done)
+
+					fileList.Unselect(id)
+				}				
 			}
 		}
 	}

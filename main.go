@@ -40,7 +40,7 @@ func main() {
 	pbFormatter := func() string { return config.Progress.Title }
 	config.Progress.ProgressBar.TextFormatter = pbFormatter
 
-	mediaviewerv := a.NewWindow("Visualizador")
+	mediaviewerv := a.NewWindow("Attendant Zoom")
 	mediaviewerv.Resize(fyne.NewSize(640, 360))
 
 	backgroundImage := canvas.NewImageFromFile("resources/yeartext.png")
