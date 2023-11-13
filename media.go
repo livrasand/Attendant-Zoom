@@ -1,11 +1,10 @@
 package main
-
+ 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -17,14 +16,14 @@ func (c *Config) fetchMeetingStuff(m string) (err error) {
 	logrus.Debug("fetchMeetingStuff()")
 
 	if c.PurgeSaveDir {
-		logrus.Info("Eliminación de todos los archivos en " + c.SaveLocation)
+		logrus.Info("Deleting all files in " + c.SaveLocation)
 		if err := RemoveContents(c.SaveLocation); err != nil {
 			logrus.Warn(err)
 		}
 	}
 
 	if c.AutoFetchMeetingData {
-		logrus.Info("¡Recuperación automática!")
+		logrus.Info("Auto-Fetching!")
 		var data MeetingData
 		var err error
 		switch m {
@@ -57,16 +56,17 @@ func (c *Config) fetchMeetingStuff(m string) (err error) {
 		for i, video := range c.Videos {
 			name, err := c.downloadVideo(&video)
 			if err != nil {
-				return err
+				logrus.Warnf("error fetching video: %s => %s", name, err)
+				continue
 			}
 			c.Videos[i].Name = name
 		}
 
 		for _, picture := range c.Pictures {
-			logrus.Infof("guardar imagen %s", picture.Name)
+			logrus.Infof("saving picture %s", picture.Name)
 			file := filepath.Join(c.SaveLocation, picture.Name)
 			if os.WriteFile(file, picture.Payload, 0644) != nil {
-				return errors.New("error al escribir datos en " + file)
+				return errors.New("error writing data to " + file)
 			}
 		}
 	}
@@ -79,7 +79,7 @@ func (c *Config) fetchMeetingStuff(m string) (err error) {
 }
 
 func (c *Config) createPlaylist() error {
-	logrus.Info("creando la lista de reproducción")
+	logrus.Info("creating playlist")
 
 	sort.Slice(c.Pictures, func(i, j int) bool {
 		return c.Pictures[i].Name < c.Pictures[j].Name
@@ -105,7 +105,7 @@ func (c *Config) createPlaylist() error {
 }
 
 func (c *Config) downloadSong(num string) (err error) {
-	logrus.Info("descargando canción " + num)
+	logrus.Info("downloading song " + num)
 	var res int
 	switch c.Resolution {
 	case RES240:
@@ -187,7 +187,7 @@ func (c *Config) downloadVideo(v *video) (filename string, err error) {
 	}
 
 	filename = filepath.Base(url)
-	logrus.Infof("descargando video: %s", filename)
+	logrus.Infof("downloading video: %s", filename)
 
 	payload, err := c.getFromCache(filename, checksum)
 	if err != nil {
@@ -207,16 +207,16 @@ func (c *Config) downloadSongMedia(songInfo *mediaInfo, vidKey int) (payload []b
 	url := songInfo.Files[c.Language].MP4[vidKey].File.URL
 	filename := filepath.Base(url)
 	if *c.DebugMode {
-		logrus.Debug("Descarga simulada de SongMedia:", url)
+		logrus.Debug("Mock downloadSongMedia:", url)
 	} else {
-		logrus.Debug("descargando medios" + url)
+		logrus.Debug("downloading media " + url)
 
 		if *c.DebugMode {
-			logrus.Debug("Descarga simulada de SongMedia:", url)
+			logrus.Debug("Mock Download SongMedia:", url)
 		} else {
 			resp, err := c.HttpClient.Get(url)
 			if err != nil {
-				return nil, errors.New("error al descargar " + url)
+				return nil, errors.New("failed to download " + url)
 			}
 
 			c.Progress.ProgressBar.SetValue(0)
@@ -226,13 +226,13 @@ func (c *Config) downloadSongMedia(songInfo *mediaInfo, vidKey int) (payload []b
 
 			data := io.TeeReader(resp.Body, c.Progress)
 
-			payload, err = ioutil.ReadAll(data)
+			payload, err = io.ReadAll(data)
 			if err != nil {
-				return nil, errors.New("error al leer datos de " + url)
+				return nil, errors.New("error reading data from " + url)
 			}
 
 			if !validChecksum(songInfo.Files[c.Language].MP4[vidKey].File.Checksum, payload) {
-				return nil, errors.New("suma de comprobación no válida para " + filename)
+				return nil, errors.New("invalid checksum for " + filename)
 			}
 		}
 	}
@@ -256,7 +256,7 @@ func (c *Config) downloadVideoMedia(url string, filesize int) (payload []byte, e
 
 		data := io.TeeReader(resp.Body, c.Progress)
 
-		payload, err = ioutil.ReadAll(data)
+		payload, err = io.ReadAll(data)
 		if err != nil {
 			return nil, errors.New("error reading data from " + url)
 		}
@@ -271,12 +271,12 @@ func (c *Config) downloadVideoMedia(url string, filesize int) (payload []byte, e
 
 func (c *Config) getSongInfo(num string) (*mediaInfo, error) {
 	logrus.Debug("fetching info for song number " + num)
-	resp, err := c.HttpClient.Get(fmt.Sprintf("https://pubmedia.jw-api.org/GETPUBMEDIALINKS?output=json&pub=sjjm&fileformat=mp4&alllangs=0&track=%s&langwritten=%s&txtCMSLang=%s", num, c.Language, c.Language))
+	resp, err := c.HttpClient.Get(fmt.Sprintf("https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS?output=json&pub=sjjm&fileformat=mp4&alllangs=0&track=%s&langwritten=%s&txtCMSLang=%s", num, c.Language, c.Language))
 	if err != nil {
 		return nil, errors.New("failed to get media info for song #" + num)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("error reading info for song #" + num)
 	}
@@ -296,7 +296,7 @@ func (c *Config) getMediaVideoInfo(v *video) (*mediaInfo, error) {
 	} else {
 		variable = fmt.Sprintf("&pub=%s", v.KeySymbol.String)
 	}
-	url := fmt.Sprintf("https://pubmedia.jw-api.org/GETPUBMEDIALINKS?%s&output=json&fileformat=mp4&alllangs=0&track=%v&langwritten=%s&txtCMSLang=%s", variable, v.Track.Int64, c.Language, c.Language)
+	url := fmt.Sprintf("https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS?%s&output=json&fileformat=mp4&alllangs=0&track=%v&langwritten=%s&txtCMSLang=%s", variable, v.Track.Int64, c.Language, c.Language)
 
 	logrus.Debug("getMediaVideoInfo() url:", url)
 	resp, err := c.HttpClient.Get(url)
@@ -304,7 +304,7 @@ func (c *Config) getMediaVideoInfo(v *video) (*mediaInfo, error) {
 		return nil, fmt.Errorf("failed to get media info for video: %#v", v)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading info for video: %#v", v)
 	}
@@ -327,7 +327,7 @@ func (c *Config) getPubVideoInfo(v *video) (*PubVideo, error) {
 		return nil, fmt.Errorf("failed to get media info for video: %#v", v)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading info for video: %#v", v)
 	}

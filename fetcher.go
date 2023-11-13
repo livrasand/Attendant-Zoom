@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -25,7 +24,7 @@ func (c *Config) getMMData() (mmd MeetingData, err error) {
 		return
 	}
 
-	tempDir, err := ioutil.TempDir("", "jwpub_fetcher_")
+	tempDir, err := os.MkdirTemp("", "jwpub_fetcher_")
 	if err != nil {
 		return
 	}
@@ -125,7 +124,7 @@ func (c *Config) getWMData() (wmd MeetingData, err error) {
 		return
 	}
 
-	tempDir, err := ioutil.TempDir("", "jwpub_fetcher_")
+	tempDir, err := os.MkdirTemp("", "jwpub_fetcher_")
 	if err != nil {
 		return
 	}
@@ -207,7 +206,7 @@ func (c *Config) getDocMedia(ld LinkedDocument) (md MeetingData, err error) {
 		return
 	}
 
-	tempDir, err := ioutil.TempDir("", "jwpub_fetcher_")
+	tempDir, err := os.MkdirTemp("", "jwpub_fetcher_")
 	if err != nil {
 		return
 	}
@@ -311,9 +310,9 @@ func (c *Config) getJWPubInfo(year, month int, pub string) (*mediaInfo, error) {
 	var str string
 	switch pub {
 	case "w", "mwb":
-		str = fmt.Sprintf("https://pubmedia.jw-api.org/GETPUBMEDIALINKS?issue=%d%02d&output=json&pub=%s&fileformat=JWPUB&alllangs=0&langwritten=%s&txtCMSLang=%s", year, month, pub, c.Language, c.Language)
+		str = fmt.Sprintf("https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS?issue=%d%02d&output=json&pub=%s&fileformat=JWPUB&alllangs=0&langwritten=%s&txtCMSLang=%s", year, month, pub, c.Language, c.Language)
 	default:
-		str = fmt.Sprintf("https://pubmedia.jw-api.org/GETPUBMEDIALINKS?output=json&pub=%s&fileformat=JWPUB&alllangs=0&langwritten=%s&txtCMSLang=%s", pub, c.Language, c.Language)
+		str = fmt.Sprintf("https://b.jw-cdn.org/apis/pub-media/GETPUBMEDIALINKS?output=json&pub=%s&fileformat=JWPUB&alllangs=0&langwritten=%s&txtCMSLang=%s", pub, c.Language, c.Language)
 	}
 	logrus.Debug("getJWPubInfo()", str)
 
@@ -326,7 +325,7 @@ func (c *Config) getJWPubInfo(year, month int, pub string) (*mediaInfo, error) {
 		return nil, fmt.Errorf("no workbook available for %v-%02d", year, month)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("error reading info for workbook")
 	}
@@ -351,7 +350,7 @@ func (c *Config) download(jwpi JWPubItem) ([]byte, error) {
 
 	data := io.TeeReader(resp.Body, c.Progress)
 
-	body, err = ioutil.ReadAll(data)
+	body, err = io.ReadAll(data)
 	if err != nil {
 		return body, errors.New("error reading data from " + jwpi.File.URL)
 	}

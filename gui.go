@@ -18,12 +18,14 @@ import (
     "github.com/hajimehoshi/oto"
 	"log"
 	"fmt"
+	"sync"
 )
 
 var currentSelectedFilePath string
+var currentPlayer *oto.Player
+var playerMutex sync.Mutex
 
 func playAudioMP3(filePath string, done chan bool) {
-	// Abre el archivo MP3 para lectura
 	file, err := os.Open(filePath)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Error al abrir el archivo MP3 '%s': %s", filePath, err)
@@ -32,7 +34,6 @@ func playAudioMP3(filePath string, done chan bool) {
 	}
 	defer file.Close()
 
-	// Decodifica el archivo MP3
 	mp3Decoder, err := mp3.NewDecoder(file)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Error al decodificar el archivo MP3 '%s': %s", filePath, err)
@@ -40,7 +41,6 @@ func playAudioMP3(filePath string, done chan bool) {
 		return
 	}
 
-	// Prepara el contexto de audio Oto
 	otoContext, err := oto.NewContext(44100, 2, 2, 8192)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Error al crear el contexto de audio Oto: %s", err)
@@ -49,37 +49,52 @@ func playAudioMP3(filePath string, done chan bool) {
 	}
 	defer otoContext.Close()
 
-	// Crea un nuevo reproductor de audio
 	player := otoContext.NewPlayer()
 	defer player.Close()
 
-	// Configura un buffer de lectura
-	bufferSize := 1
-	buffer := make([]byte, bufferSize)
+	// Guarda la referencia al reproductor actual de manera segura con un mutex
+    playerMutex.Lock()
+    currentPlayer = player
+    playerMutex.Unlock()
 
-	// Lee y reproduce el audio MP3 en un goroutine independiente
-	for {
-		select {
-		case <-done:
-			// Se recibió la señal de finalización
-			return
-		default:
-			// Sigue leyendo y reproduciendo el audio
-			_, err := mp3Decoder.Read(buffer)
-			if err != nil {
-				// Fin del archivo MP3
-				done <- true
-				return
-			}
-			player.Write(buffer)
-		}
-	}
+    bufferSize := 1
+    buffer := make([]byte, bufferSize)
+
+    for {
+        select {
+        case <-done:
+            // Se recibió la señal de finalización
+            return
+        default:
+            // Sigue leyendo y reproduciendo el audio
+            _, err := mp3Decoder.Read(buffer)
+            if err != nil {
+                // Fin del archivo MP3
+                done <- true
+                return
+            }
+
+            // Utiliza el mutex para garantizar operaciones atómicas en currentPlayer
+            playerMutex.Lock()
+            player.Write(buffer)
+            playerMutex.Unlock()
+        }
+    }
+}
+
+// Función para detener la reproducción actual
+func stopPlayback() {
+    playerMutex.Lock()
+    defer playerMutex.Unlock()
+
+    if currentPlayer != nil {
+        // Detén y cierra el reproductor actual
+        currentPlayer.Close()
+        currentPlayer = nil
+    }
 }
 
 
-
-
-// La función isMP3File debe determinar si un archivo es un archivo MP3
 func isMP3File(fileName string) bool {
     ext := strings.ToLower(filepath.Ext(fileName))
     return ext == ".mp3"
@@ -281,58 +296,77 @@ func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Contai
     )
 
 	fileList.OnSelected = func(id widget.ListItemID) {
+		if id < 0 || int(id) >= len(fileNames) {
+			logrus.Warnf("Selección fuera de rango: %d", id)
+			return
+		}
+
 		logrus.Infof("OnSelected controlador activado para el elemento %d", id)
 	
-		if id >= 0 && int(id) < len(fileNames) {
-			selectedFileName := fileNames[id]
-			newSelectedFilePath := filepath.Join(downloadedFolderPath, selectedFileName)
+		selectedFileName := fileNames[id]
+		newSelectedFilePath := filepath.Join(downloadedFolderPath, selectedFileName)
 	
-			if isImageFile(selectedFileName) {
-				// Limpia las rutas antes de compararlas
-				newSelectedFilePath = filepath.Clean(newSelectedFilePath)
-				currentSelectedFilePath = filepath.Clean(currentSelectedFilePath)
+		if isImageFile(selectedFileName) {
+			// Limpia las rutas antes de compararlas
+			newSelectedFilePath = filepath.Clean(newSelectedFilePath)
+			currentSelectedFilePath = filepath.Clean(currentSelectedFilePath)
 	
-				// Agrega mensajes de registro para verificar las rutas antes de la comparación
-				logrus.Infof("newSelectedFilePath antes de la comparación: %s", newSelectedFilePath)
-				logrus.Infof("currentSelectedFilePath antes de la comparación: %s")
+			// Agrega mensajes de registro para verificar las rutas antes de la comparación
+			logrus.Infof("newSelectedFilePath antes de la comparación: %s", newSelectedFilePath)
+			logrus.Infof("currentSelectedFilePath antes de la comparación: %s", currentSelectedFilePath)
 	
-				if newSelectedFilePath == currentSelectedFilePath {
-					// Si la imagen seleccionada es la misma que la actual, quítala
-					currentSelectedFilePath = ""
-					backgroundImage := canvas.NewImageFromFile("resources/yeartext.png")
-					backgroundImage.Resize(fyne.NewSize(640, 360))
-
-					containerv := container.NewMax(backgroundImage)
-					containerv.Resize(fyne.NewSize(640, 360))
-
-					mediaviewer.SetContent(containerv)
+			if newSelectedFilePath == currentSelectedFilePath {
+				// Si la imagen seleccionada es la misma que la actual, quítala
+				currentSelectedFilePath = ""
+				backgroundImage := canvas.NewImageFromFile("resources/yeartext.png")
+				backgroundImage.Resize(fyne.NewSize(640, 360))
 	
-					// Deselecciona el elemento
-					fileList.Unselect(id)
+				containerv := container.NewMax(backgroundImage)
+				containerv.Resize(fyne.NewSize(640, 360))
 	
-					logrus.Infof("Ocultar imagen seleccionada")
-				} else {
-					// Si la imagen seleccionada es diferente, muéstrala y actualiza la selección actual
-					currentSelectedFilePath = newSelectedFilePath
-					setImageInView(mediaviewer, currentSelectedFilePath)
+				mediaviewer.SetContent(containerv)
 	
-					// Deselecciona el elemento
-					fileList.Unselect(id)
+				// Deselecciona el elemento
+				fileList.Unselect(id)
 	
-					logrus.Infof("Mostrar nueva imagen seleccionada")
-				}
+				logrus.Infof("Ocultar imagen seleccionada")
 			} else {
-				if isMP3File(selectedFileName) {
-					// Reproduce el archivo MP3
-					done := make(chan bool)
-					go playAudioMP3(newSelectedFilePath, done)
-
-					fileList.Unselect(id)
-				}				
+				// Si la imagen seleccionada es diferente, muéstrala y actualiza la selección actual
+				currentSelectedFilePath = newSelectedFilePath
+				setImageInView(mediaviewer, currentSelectedFilePath)
+	
+				// Deselecciona el elemento
+				fileList.Unselect(id)
+	
+				logrus.Infof("Mostrar nueva imagen seleccionada")
+			}
+		} else if isMP3File(selectedFileName) {
+			// Limpia las rutas antes de compararlas
+			newSelectedFilePath = filepath.Clean(newSelectedFilePath)
+			currentSelectedFilePath = filepath.Clean(currentSelectedFilePath)
+	
+			if newSelectedFilePath == currentSelectedFilePath {
+				// Si el audio seleccionado es el mismo que el actual, detenlo
+				currentSelectedFilePath = ""
+				stopPlayback()
+	
+				fileList.Unselect(id)
+			} else {
+				// Si el audio seleccionado es diferente, reproduce y actualiza la selección actual
+				currentSelectedFilePath = newSelectedFilePath
+				done := make(chan bool)
+				go func() {
+					defer close(done)
+					stopPlayback()
+					playAudioMP3(newSelectedFilePath, done)
+				}()
+	
+				fileList.Unselect(id)
+	
+				logrus.Infof("Archivo de audio reproduciendo: %s", newSelectedFilePath)
 			}
 		}
 	}
-	
 	
 	fileListContainer := container.NewScroll(fileList)
 
@@ -357,7 +391,7 @@ func setImageInView(mediaviewer fyne.Window, imagePath string) {
 
 func isImageFile(fileName string) bool {
     ext := strings.ToLower(filepath.Ext(fileName))
-    return ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif" || ext == ".bmp" || ext == ".webp"
+    return ext == ".png" || ext == ".jpg" || ext == ".jpeg"
 }
 
 //func isVideoFile(fileName string) bool {
@@ -366,18 +400,14 @@ func isImageFile(fileName string) bool {
 //}
 
 func logError(errorMessage string) {
-    // Configura la ubicación de la carpeta de logs
     logFolder := "logs"
 
-    // Crea la carpeta de logs si no existe
     if _, err := os.Stat(logFolder); os.IsNotExist(err) {
         os.Mkdir(logFolder, os.ModeDir)
     }
 
-    // Genera el nombre del archivo de registro con fecha y hora
     logFileName := filepath.Join(logFolder, time.Now().Format("2006-01-02_15-04-05")+".log")
 
-    // Abre el archivo de registro
     logFile, err := os.OpenFile(logFileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
     if err != nil {
         fmt.Println("Error al abrir el archivo de registro:", err)
@@ -385,7 +415,6 @@ func logError(errorMessage string) {
     }
     defer logFile.Close()
 
-    // Escribe el mensaje de error en el archivo de registro
     log.SetOutput(logFile)
     log.Println(errorMessage)
 }

@@ -39,8 +39,8 @@ func (c *Config) LoadDefaults() {
 	c.CreatePlaylist = true
 	c.SaveLocation = filepath.Join(homeDir, "Downloads/meetings")
 	c.Resolution = RES720
-	c.Language = "S"
-	c.PubSymbols = []string{"th", "lff"}
+	c.Language = "E"
+	c.PubSymbols = []string{"th", "bt"}
 	c.CacheLocation = filepath.Join(homeDir, "Downloads/meetings_cache")
 }
 
@@ -62,7 +62,7 @@ func (c *Config) readConfigFromFile() {
 func (c *Config) writeConfigToFile() {
 	homeDir := os.Getenv("HOME")
 
-	logrus.Info("Guardando configuraciones")
+	logrus.Info("Saving settings")
 
 	config := struct {
 		AutoFetchMeetingData bool

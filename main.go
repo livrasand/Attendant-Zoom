@@ -10,8 +10,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/sirupsen/logrus"
 	"fyne.io/fyne/v2"
-
-	"fmt"
 )
 
 const (
@@ -28,6 +26,11 @@ func main() {
 	config := NewConfig()
 	a := app.NewWithID("AttendantZoom")
 
+    icon, err := fyne.LoadResourceFromPath("icon.png")
+    if err != nil {
+        
+    }
+
 	config.DebugMode = flag.Bool("d", false, "descarga falsa; imprimir información de depuración")
 	flag.Parse()
 	if *config.DebugMode {
@@ -42,6 +45,7 @@ func main() {
 
 	mediaviewerv := a.NewWindow("Attendant Zoom")
 	mediaviewerv.Resize(fyne.NewSize(640, 360))
+    mediaviewerv.SetIcon(icon)
 
 	backgroundImage := canvas.NewImageFromFile("resources/yeartext.png")
 	backgroundImage.Resize(fyne.NewSize(640, 360))
@@ -64,11 +68,9 @@ func main() {
 	)
 
 	w := a.NewWindow("Attendant Zoom")
-	w.SetContent(container.NewVBox(tabs))
+	w.SetContent(container.NewVBox(tabs))	
+    w.SetIcon(icon)
 
 	mediaviewerv.Show()
 	w.ShowAndRun()
-
-	fmt.Println("Presiona Enter para salir...")
-	fmt.Scanln()
 }
