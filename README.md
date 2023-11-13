@@ -1,14 +1,18 @@
-# Attendant Zoom
+# Attendant Zoom en Go
 <img src="icon.png">
 
 > ##### Si consideras útil este proyecto, apóyalo haciendo "★ Star" en el repositorio. ¡Gracias!
-> ##### Si le gusta Attendant Zoom, considere <a href="https://www.paypal.com/paypalme/livrados" target="_blank">patrocinar</a> nuestro trabajo.
+> ##### Damos la bienvenida a las donaciones si estás satisfecho con la aplicación y deseas <a href="https://www.paypal.com/paypalme/livrados" target="_blank">apoyar</a> nuestros esfuerzos.
 > ##### ¡Agradezco enormemente a <a href="https://github.com/jomast/">@jomast</a> por compartir el valioso código fuente que facilita la descarga de multimedia para nuestras reuniones. Su generosidad y colaboración son fundamentales para el éxito de este proyecto. 🙌
 
 ### ¿Qué es Attendant Zoom?
-Facilita la compartición de contenido multimedia durante reuniones, ya sea en plataformas de videoconferencias o en el Salón del Reino, ofreciendo una adaptación perfecta para encuentros híbridos, remotos o presenciales. Nuestra aplicación es completamente gratuita y no incluye publicidad.
+Attendant Zoom es una aplicación para compartir multimedia durante las reuniones en plataformas de videoconferencia o en el Salón del Reino, adaptativa para las nuevas reuniones híbridas, totalmente remotas o en persona. Attendant Zoom le permite hacer todo con facilidad. No se requiere registro, inicio de sesión o cuenta de datos en la nube. Attendant Zoom no almacena ni compila información, es un programa almacenado en su computadora. Para compartir contenido multimedia en plataformas de videoconferencia, debe ser anfitrión o coanfitrión. Attendant Zoom es gratuito, sin publicidad y no requiere un pago para su uso. Es compatible con todas las plataformas de videoconferencias.
 
-Está diseñada especialmente para aquellos dispositivos que no cuentan con la compatibilidad de JW Library, no tienen acceso a una tienda de aplicaciones o experimentan lentitud o bloqueos al usar JW Library en sus computadoras. Simplifica tus reuniones y con nuestra herramienta de confianza.
+> ### Lanzada por primera vez en agosto del 2021, ha acumulado más de 36,700 descargas y cuenta con más de 6,300 usuarios activos cada semana
+
+Eso es lo que ha hecho Attendant Zoom para Windows, **puedes descargar la versión para Windows [aquí](https://www.recursosteocraticos.com/files/file/9415-attendant-zoom-2023-summer-edition/?do=download)**.
+
+Attendant Zoom no remplaza JW Library, como puedes ver, es un complemento perfecto, si la computadora no ejecuta JW Library, Attendant Zoom es tu alternativa perfecta. ¡Pruébalo, es gratis y siempre lo será! Está diseñada como _"alternativa"_ para aquellos dispositivos que no cuentan con la compatibilidad de JW Library, no tienen acceso a una tienda de aplicaciones o experimentan lentitud o bloqueos al usar JW Library en sus computadoras. ¡Simplifica tus reuniones con nuestra herramienta de confianza!
 
 Attendant Zoom incorpora un reproductor de audio diseñado con canales (chan) para facilitar la comunicación entre múltiples goroutines, y un mecanismo de sincronización para operaciones atómicas.
 
