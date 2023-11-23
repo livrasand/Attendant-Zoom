@@ -19,6 +19,8 @@ Attendant Zoom incorpora un reproductor de audio diseñado con canales (chan) pa
 ### ¿Cómo empiezo?
 Para comenzar a utilizar esta aplicación, dirígete a la sección de Releases de este repositorio. Descarga el instalador correspondiente a tu sistema operativo (Windows, macOS o Linux), y ejecuta el instalador y sigue las instrucciones para completar la instalación de la aplicación en tu sistema.
 
+Para las versiones de Windows y macOS, Attendant Zoom incluye el ejecutable de ffmpeg, para Linux, deberás instalarlo manualmente, entra a los siguientes enlaces de acuerdo a tu distribución: [Debian](https://packages.debian.org/bookworm/ffmpeg) o [Ubuntu](https://launchpad.net/ubuntu/+source/ffmpeg), si tienes otra distribución, por favor lee la documentación de [ffmpeg](https://ffmpeg.org/download.html).
+
 ¡Listo! Ahora deberías tener la aplicación instalada y lista para su uso.
 
 ### ¿Qué puede hacer Attendant Zoom?
