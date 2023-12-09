@@ -17,6 +17,10 @@ Attendant Zoom no remplaza JW Library, como puedes ver, es un complemento perfec
 Attendant Zoom incorpora un reproductor de audio diseñado con canales (chan) para facilitar la comunicación entre múltiples goroutines, y un mecanismo de sincronización para operaciones atómicas.
 
 ### ¿Cómo empiezo?
+> [!IMPORTANT]
+> Git LFS habilitado[^1]
+[^1]: Si no tienes **Git LFS instalado**, no tendrás acceso a los archivos de gran tamaño original. Si intentas clonar el repositorio, solo extraerás los archivos punteros, y no tendrás acceso a los datos trues.
+
 Para comenzar a utilizar esta aplicación, dirígete a la sección de Releases de este repositorio. Descarga el instalador correspondiente a tu sistema operativo (Windows, macOS o Linux), y ejecuta el instalador y sigue las instrucciones para completar la instalación de la aplicación en tu sistema.
 
 Para las versiones de Windows y macOS, Attendant Zoom incluye el ejecutable de ffmpeg, para Linux, deberás instalarlo manualmente, entra a los siguientes enlaces de acuerdo a tu distribución: [Debian](https://packages.debian.org/bookworm/ffmpeg) o [Ubuntu](https://launchpad.net/ubuntu/+source/ffmpeg), si tienes otra distribución, por favor lee la documentación de [ffmpeg](https://ffmpeg.org/download.html).
@@ -52,4 +56,4 @@ En general, Attendant Zoom tiene todas las funciones respecto al departamento de
 ### ¿Attendant Zoom funciona en mi idioma?
 **¡Sí!** La multimedia para las reuniones de los testigos de Jehová se pueden descargar automáticamente en cualquiera de los miles de idiomas que están disponibles en JW.ORG. La lista de idiomas disponibles se actualiza dinámicamente. Todo lo que necesitas hacer es seleccionar cuál quieres.
 
-¡Además, constantemente el propio Attendant Zoom se está traduciendo a varios idiomas! Por lo tanto, puede configurar el idioma que desea que se muestre en la interfaz de Attendant Zoom. ¿Quieres ayudar a traducir Attendant Zoom a tu idioma? Consulte nuestro archivo CONTRIBUTING.md para obtener instrucciones sobre cómo hacerlo.
+¡Además, constantemente el propio Attendant Zoom se está traduciendo a varios idiomas! Por lo tanto, puede configurar el idioma que desea que se muestre en la interfaz de Attendant Zoom. ¿Quieres ayudar a traducir Attendant Zoom a tu idioma? Utilizo [Poedit](https://poedit.net/) para una fácil traducción de Attendant Zoom, ve al directorio [languages](languages) para descargar el archivo **“español.po”**. Es un archivo base para traducir a otros idiomas.
