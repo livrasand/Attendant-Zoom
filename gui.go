@@ -281,7 +281,7 @@ func (c *Config) settingsGUI() *fyne.Container {
 }
 
 func (c *Config) createDownloadedFilesView(mediaviewer fyne.Window) *fyne.Container {
-	downloadedFolderPath := "C:\\GoAttendant\\Attendant Zoom\\meetings"
+	downloadedFolderPath := c.SaveLocation
 
 	currentSelectedFilePath := ""
 
